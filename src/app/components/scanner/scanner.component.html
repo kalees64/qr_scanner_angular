@@ -1,0 +1,59 @@
+<section class="w-full h-full grid justify-center gap-2 overflow-auto p-5">
+  <h1 class="text-lg font-bold text-center">QR Scanner</h1>
+  <div class="mt-2" *ngIf="!scannedBarcode">
+    <zxing-scanner
+      class="rounded"
+      [formats]="formats"
+      (camerasFound)="onCamerasFound($event)"
+      [device]="selectedDevice"
+      [tryHarder]="true"
+      (scanSuccess)="onScanSuccess($event)"
+    ></zxing-scanner>
+  </div>
+
+  <p *ngIf="scannedBarcode" class="mt-4 p-3 rounded bg-white">
+    <b>Scanned Barcode:</b> {{ scannedBarcode | json }}
+  </p>
+
+  <div *ngIf="scannedBarcode">
+    <form [formGroup]="qrScanForm" (submit)="onSubmit()">
+      <div class="grid">
+        <label class="form-label">Original QR code Data</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="originalQrCodeData"
+          readonly
+        />
+      </div>
+      <div class="grid">
+        <label class="form-label">Modify original QR code Data</label>
+        <!-- <input
+          type="text"
+          value="{{ scannedBarcode | json }}"
+          class="form-control"
+        /> -->
+        <textarea
+          name="scanData"
+          id="sacnData"
+          class="form-control"
+          formControlName="modifiedQrCodeData"
+          rows="5"
+        ></textarea>
+      </div>
+
+      <div class="pt-2 flex gap-2 items-center justify-end">
+        <button
+          type="button"
+          class="btn bg-red-500 text-white"
+          (click)="onScanAgain()"
+        >
+          Scan Again
+        </button>
+        <button type="submit" class="btn bg-green-600 text-white">
+          Modify and Store
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

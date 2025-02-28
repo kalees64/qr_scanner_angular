@@ -1,1 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+.form-label {
+  @apply font-semibold py-1;
+}
+
+.form-control {
+  @apply w-full p-2 border rounded focus:outline-blue-400 disabled:opacity-60 disabled:cursor-not-allowed read-only:opacity-80;
+}
+
+.btn {
+  @apply p-2 px-4 rounded disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer hover:-translate-y-1;
+}
