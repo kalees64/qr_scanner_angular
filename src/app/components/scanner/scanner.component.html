@@ -1,4 +1,4 @@
-<section class="w-full h-full grid justify-center gap-2 overflow-auto p-5">
+<section class="w-full grid justify-center gap-2 overflow-auto p-5">
   <h1 class="text-lg font-bold text-center">QR Scanner</h1>
   <div class="mt-2" *ngIf="!qrResultString">
     <zxing-scanner
@@ -9,38 +9,18 @@
       (camerasFound)="onScannerReady()"
       [device]="selectedDevice"
       [tryHarder]="true"
-      (scanSuccess)="onCodeResult($event)"
+      (scanSuccess)="onScanSuccess($event)"
     ></zxing-scanner>
-  </div>
-
-  <video #videoElement autoplay></video>
-  <canvas #qrCanvas width="300" height="300"></canvas>
-
-  <p *ngIf="qrResultString">Scanned QR Code: {{ qrResultString }}</p>
-
-  <div *ngIf="blobUrl">
-    <h3>Captured QR Code Image:</h3>
-    <img [src]="blobUrl" alt="Captured QR Code" class="rounded" />
-  </div>
-
-  <div *ngIf="dataUrl">
-    <h3>Captured QR Code Image Data URL:</h3>
-    <img [src]="dataUrl" alt="Captured QR Code" class="rounded" />
-  </div>
-
-  <div *ngIf="qrResultString">
-    <button
-      type="button"
-      class="btn bg-red-500 text-white"
-      (click)="onScanAgain()"
-    >
-      Scan Again
-    </button>
   </div>
 
   <p *ngIf="scannedBarcode" class="mt-4 p-3 rounded bg-white">
     <b>Scanned Barcode:</b> {{ scannedBarcode | json }}
   </p>
+  <div *ngIf="scannedBarcode" class="mt-4 p-3 rounded bg-white grid gap-3">
+    <b>Generated Barcode:</b>
+    <img src="{{ qrDataUrl }}" alt="QR Image" class="size-32" />
+    <small>*updating...</small>
+  </div>
 
   <div *ngIf="scannedBarcode">
     <img
@@ -60,19 +40,36 @@
         />
       </div>
       <div class="grid">
-        <label class="form-label">Modify original QR code Data</label>
-        <!-- <input
+        <label class="form-label">Medicine name</label>
+        <input
           type="text"
-          value="{{ scannedBarcode | json }}"
           class="form-control"
-        /> -->
-        <textarea
-          name="scanData"
-          id="sacnData"
+          formControlName="medicineName"
+        />
+      </div>
+      <div class="grid">
+        <label class="form-label">Manufacturer name</label>
+        <input
+          type="text"
           class="form-control"
-          formControlName="modifiedQrCodeData"
-          rows="5"
-        ></textarea>
+          formControlName="manufacturerName"
+        />
+      </div>
+      <div class="grid">
+        <label class="form-label">Medicine Type</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="medicineType"
+        />
+      </div>
+      <div class="grid">
+        <label class="form-label">Medicine Price</label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="medicinePrice"
+        />
       </div>
 
       <div class="pt-2 flex gap-2 items-center justify-end">
@@ -83,7 +80,11 @@
         >
           Scan Again
         </button>
-        <button type="submit" class="btn bg-green-600 text-white">
+        <button
+          type="submit"
+          class="btn bg-green-600 text-white"
+          [disabled]="qrScanForm.invalid"
+        >
           Modify and Store
         </button>
       </div>

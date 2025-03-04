@@ -1,1 +1,53 @@
-<p>re-label works!</p>
+<section *ngIf="medicineId">
+  <form
+    method="post"
+    class="p-5"
+    [formGroup]="medicineForm"
+    (submit)="onSubmit()"
+  >
+    <div class="grid">
+      <label class="form-label">Original QR code Data</label>
+      <input
+        type="text"
+        class="form-control"
+        formControlName="originalQrCodeData"
+        readonly
+      />
+    </div>
+    <div class="grid">
+      <label class="form-label">Medicine name</label>
+      <input type="text" class="form-control" formControlName="medicineName" />
+    </div>
+    <div class="grid">
+      <label class="form-label">Manufacturer name</label>
+      <input
+        type="text"
+        class="form-control"
+        formControlName="manufacturerName"
+      />
+    </div>
+    <div class="grid">
+      <label class="form-label">Medicine Type</label>
+      <input type="text" class="form-control" formControlName="medicineType" />
+    </div>
+    <div class="grid">
+      <label class="form-label">Medicine Price</label>
+      <input
+        type="number"
+        class="form-control"
+        formControlName="medicinePrice"
+      />
+    </div>
+
+    <div class="pt-2 flex gap-2 items-center justify-end">
+      <button type="button" class="btn bg-red-500 text-white">
+        Scan Again
+      </button>
+      <button type="submit" class="btn bg-green-600 text-white">
+        Modify and Store
+      </button>
+    </div>
+  </form>
+</section>
+
+<section *ngIf="!medicineId">No Data</section>

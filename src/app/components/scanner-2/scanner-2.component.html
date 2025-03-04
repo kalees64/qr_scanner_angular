@@ -7,7 +7,16 @@
   <ng-template #scannedContent>
     <div class="py-2 grid gap-2">
       <p *ngIf="scannedData"><b>Scanned Data:</b> {{ scannedData }}</p>
-      <img *ngIf="qrImage" [src]="qrImage" class="rounded-lg" alt="QR Code" />
+      <div class="flex items-center gap-4">
+        <img *ngIf="qrImage" [src]="qrImage" class="rounded-lg" alt="QR Code" />
+        <img
+          *ngIf="newQr"
+          [src]="newQr"
+          class="rounded-lg size-72"
+          alt="QR Code Generated"
+        />
+      </div>
+
       <button
         (click)="handleScanAgain()"
         class="px-4 py-2 w-64 rounded bg-green-500 cursor-pointer"

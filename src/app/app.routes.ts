@@ -1,16 +1,20 @@
 import { Routes } from '@angular/router';
 import { ScannerComponent } from './components/scanner/scanner.component';
 import { ReLabelComponent } from './components/re-label/re-label.component';
-import { Scanner2Component } from './components/scanner-2/scanner-2.component';
+import { ListMedicinesComponent } from './components/list-medicines/list-medicines.component';
 
 export const routes: Routes = [
   {
     path: 'scanner',
-    component: Scanner2Component,
+    component: ScannerComponent,
   },
   {
-    path: 're-label',
+    path: 're-label/:id',
     component: ReLabelComponent,
+  },
+  {
+    path: 'all-medicines',
+    component: ListMedicinesComponent,
   },
   {
     path: '',

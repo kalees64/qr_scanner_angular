@@ -8,7 +8,18 @@ import {
 import { ZXingScannerComponent, ZXingScannerModule } from '@zxing/ngx-scanner';
 import { BarcodeFormat } from '@zxing/library';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Router } from '@angular/router';
+import { QRCodeStyling } from '@liquid-js/qr-code-styling';
+import { v4 as uuidv4 } from 'uuid';
+import { HttpClient } from '@angular/common/http';
+import { toast } from 'ngx-sonner';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-scanner',
@@ -44,8 +55,6 @@ export class ScannerComponent implements OnInit, AfterViewInit {
 
   qrScanForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
-
   qrImage: string | null = null;
 
   @ViewChild('scanner') scanner!: ZXingScannerComponent;
@@ -62,7 +71,32 @@ export class ScannerComponent implements OnInit, AfterViewInit {
 
   blobUrl: string | null = null;
 
-  dataUrl: string | null = null;
+  qrDataUrl: string | null = null;
+  private qrCode: QRCodeStyling;
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private http: HttpClient
+  ) {
+    this.qrCode = new QRCodeStyling({
+      width: 150,
+      height: 150,
+      data: 'something',
+      dotsOptions: {
+        color: '#000000',
+        // color: 'blue',
+        type: 'extra-rounded',
+      },
+      backgroundOptions: {
+        color: '#ffffff',
+      },
+      imageOptions: {
+        crossOrigin: 'anonymous',
+        margin: 10,
+      },
+    });
+  }
 
   ngOnInit(): void {
     this.initQrForm();
@@ -74,10 +108,17 @@ export class ScannerComponent implements OnInit, AfterViewInit {
     }
   }
 
+  navigateTo(path: string) {
+    this.router.navigateByUrl(path);
+  }
+
   initQrForm() {
     this.qrScanForm = this.fb.group({
       originalQrCodeData: [''],
-      modifiedQrCodeData: [''],
+      medicineName: ['', Validators.required],
+      medicineType: [''],
+      medicinePrice: [''],
+      manufacturerName: [''],
     });
   }
 
@@ -94,100 +135,20 @@ export class ScannerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onScanSuccess(result: string) {
+  async onScanSuccess(result: string) {
     this.scannedBarcode = result;
     console.log('Scanned Barcode:', result);
 
-    this.qrScanForm.patchValue({
-      originalQrCodeData: JSON.stringify(result).slice(
-        1,
-        JSON.stringify(result).length - 1
-      ),
-      modifiedQrCodeData: JSON.stringify(result).slice(
-        1,
-        JSON.stringify(result).length - 1
-      ),
-    });
-
-    // Capture the QR code image
-    // if (this.isScannerReady) {
-    //   setTimeout(() => {
-    //     this.captureImage(); // Wait a bit before capturing
-    //   }, 1000);
-    // } else {
-    //   console.error('Scanner is not ready yet.');
-    // }
-  }
-
-  // captureImage() {
-  //   setTimeout(() => {
-  //     const videoElement =
-  //       this.scanner?.previewElemRef?.nativeElement.querySelector('video');
-  //     console.log('--Video element:', videoElement);
-
-  //     if (videoElement) {
-  //       videoElement.onloadeddata = () => {
-  //         // Wait until video is fully loaded
-  //         console.log('--Video is now loaded and ready for capture.');
-  //         const canvas = document.createElement('canvas');
-  //         canvas.width = videoElement.videoWidth;
-  //         canvas.height = videoElement.videoHeight;
-  //         const context = canvas.getContext('2d');
-
-  //         if (context) {
-  //           context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-  //           this.qrImage = canvas.toDataURL('image/png'); // Convert to Base64
-  //           console.log('--Captured QR Image:', this.qrImage);
-  //         }
-  //       };
-  //     } else {
-  //       console.error('Video element not found.');
-  //     }
-  //   }, 500); // Small delay to allow video stream to start
-  // }
-
-  onCodeResult(resultString: string) {
-    this.qrResultString = resultString;
-    this.captureAndUpload();
-  }
-
-  captureAndUpload() {
-    const canvas = this.qrCanvas.nativeElement;
-    const video = this.videoElement.nativeElement;
-    const context = canvas.getContext('2d');
-
-    if (context) {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            this.dataUrl = reader.result as string; // Store data URL for binding
-            console.log('Captured Image Data URL : ', this.dataUrl);
-          };
-          reader.readAsDataURL(blob);
-
-          const formData = new FormData();
-          formData.append('qrImage', blob, 'qr-code.png');
-          formData.append('qrData', this.qrResultString);
-
-          // Display blob as image
-          const blobUrl = URL.createObjectURL(blob);
-          this.blobUrl = blobUrl; // Store the blob URL to bind in the template
-
-          console.log('Captured Image Object URL : ', blobUrl);
-
-          console.log('--Form Data : ', formData);
-          console.log('--Form Data Image : ', blob);
-
-          // this.http
-          //   .post('http://localhost:3000/qrcodes/upload', formData)
-          //   .subscribe((response) => {
-          //     console.log('QR Code image uploaded successfully', response);
-          //   });
-        }
-      }, 'image/png');
+    if (result.startsWith('AssayCR')) {
+      this.navigateTo(`re-label/${result}`);
+      return;
     }
+
+    this.qrDataUrl = await this.generateQrCode(result);
+
+    this.qrScanForm.patchValue({
+      originalQrCodeData: JSON.stringify(result),
+    });
   }
 
   onScanAgain() {
@@ -196,7 +157,59 @@ export class ScannerComponent implements OnInit, AfterViewInit {
     this.qrScanForm.reset();
   }
 
-  onSubmit() {
-    console.log('--Form submitted:', this.qrScanForm.value);
+  generateQrCode(data: string): Promise<string> {
+    if (data.length > 1000) {
+      return Promise.reject(
+        'Data is too long for a QR code. Please shorten the content.'
+      );
+    }
+
+    return new Promise((resolve, reject) => {
+      this.qrCode.update({ data });
+      const div = document.createElement('div');
+      this.qrCode.append(div);
+      setTimeout(() => {
+        const svgElement = div.querySelector('svg');
+        if (svgElement) {
+          const serializer = new XMLSerializer();
+          const svgString = serializer.serializeToString(svgElement);
+          const encodedData = 'data:image/svg+xml;base64,' + btoa(svgString);
+          resolve(encodedData);
+        } else {
+          reject('Failed to generate QR code');
+        }
+      }, 500);
+    });
+  }
+
+  payload() {
+    return {
+      original_qr_data: this.scannedBarcode,
+      current_qr_code_access_code: 'AssayCR-' + uuidv4(),
+      medicine_name: this.qrScanForm.value.medicineName,
+      medicine_type: this.qrScanForm.value.medicineType,
+      manufacturer_name: this.qrScanForm.value.manufacturerName,
+      price: this.qrScanForm.value.medicinePrice,
+      re_labeled_qr_code: '',
+    };
+  }
+
+  async onSubmit() {
+    const newMedicine = this.payload();
+    const qrDataUrl = await this.generateQrCode(
+      newMedicine.current_qr_code_access_code
+    );
+    newMedicine.re_labeled_qr_code = qrDataUrl;
+    console.log('--New Medicine Data : ', newMedicine);
+
+    try {
+      let url = 'http://localhost:3000/medicines';
+      const res = await firstValueFrom(this.http.post(url, newMedicine));
+      console.log('--Response : ', res);
+      toast.success('Medicine Added Successfully');
+      this.onScanAgain();
+    } catch (error) {
+      toast.error('Something went wrong');
+    }
   }
 }

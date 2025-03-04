@@ -1,8 +1,12 @@
-<main class="w-screen h-screen p-0 m-0 bg-gray-100">
-  <header class="p-2 bg-amber-300">
+<main class="w-screen min-h-screen p-0 m-0 bg-gray-100">
+  <header class="p-2 bg-amber-300 flex items-center gap-5">
     <h1 class="text-xl font-bold">Barcode Relabeling POC</h1>
+    <a routerLink="/all-medicines">Medicines</a>
+    <a routerLink="/scanner">Scan</a>
   </header>
   <section class=" ">
     <router-outlet />
   </section>
 </main>
+
+<ngx-sonner-toaster position="top-right" richColors />

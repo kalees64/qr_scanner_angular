@@ -19,13 +19,17 @@
     "@angular/platform-browser-dynamic": "^19.1.0",
     "@angular/router": "^19.1.0",
     "@angular/service-worker": "^19.1.0",
+    "@liquid-js/qr-code-styling": "^4.0.7",
     "@tailwindcss/postcss": "^4.0.9",
     "@zxing/ngx-scanner": "^19.0.0",
+    "axios": "^1.8.1",
     "html5-qrcode": "^2.3.8",
+    "ngx-sonner": "^3.0.0",
     "postcss": "^8.5.3",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.0.9",
     "tslib": "^2.3.0",
+    "uuid": "^11.1.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
