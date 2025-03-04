@@ -1,0 +1,19 @@
+<section class="p-2 grid justify-center gap-3">
+  <h1 class="text-center font-bold">Scanner</h1>
+  <div *ngIf="isScanning; else scannedContent">
+    <div #qrReader id="qr-reader" class="mx-auto w-96 rounded"></div>
+  </div>
+
+  <ng-template #scannedContent>
+    <div class="py-2 grid gap-2">
+      <p *ngIf="scannedData"><b>Scanned Data:</b> {{ scannedData }}</p>
+      <img *ngIf="qrImage" [src]="qrImage" class="rounded-lg" alt="QR Code" />
+      <button
+        (click)="handleScanAgain()"
+        class="px-4 py-2 w-64 rounded bg-green-500 cursor-pointer"
+      >
+        Scan Again
+      </button>
+    </div>
+  </ng-template>
+</section>

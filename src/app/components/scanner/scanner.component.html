@@ -1,14 +1,41 @@
 <section class="w-full h-full grid justify-center gap-2 overflow-auto p-5">
   <h1 class="text-lg font-bold text-center">QR Scanner</h1>
-  <div class="mt-2" *ngIf="!scannedBarcode">
+  <div class="mt-2" *ngIf="!qrResultString">
     <zxing-scanner
+      *ngIf="!scannedBarcode"
+      #scanner
       class="rounded"
       [formats]="formats"
-      (camerasFound)="onCamerasFound($event)"
+      (camerasFound)="onScannerReady()"
       [device]="selectedDevice"
       [tryHarder]="true"
-      (scanSuccess)="onScanSuccess($event)"
+      (scanSuccess)="onCodeResult($event)"
     ></zxing-scanner>
+  </div>
+
+  <video #videoElement autoplay></video>
+  <canvas #qrCanvas width="300" height="300"></canvas>
+
+  <p *ngIf="qrResultString">Scanned QR Code: {{ qrResultString }}</p>
+
+  <div *ngIf="blobUrl">
+    <h3>Captured QR Code Image:</h3>
+    <img [src]="blobUrl" alt="Captured QR Code" class="rounded" />
+  </div>
+
+  <div *ngIf="dataUrl">
+    <h3>Captured QR Code Image Data URL:</h3>
+    <img [src]="dataUrl" alt="Captured QR Code" class="rounded" />
+  </div>
+
+  <div *ngIf="qrResultString">
+    <button
+      type="button"
+      class="btn bg-red-500 text-white"
+      (click)="onScanAgain()"
+    >
+      Scan Again
+    </button>
   </div>
 
   <p *ngIf="scannedBarcode" class="mt-4 p-3 rounded bg-white">
@@ -16,6 +43,12 @@
   </p>
 
   <div *ngIf="scannedBarcode">
+    <img
+      [src]="qrImage"
+      *ngIf="qrImage"
+      alt="Scanned QR Code"
+      class="rounded"
+    />
     <form [formGroup]="qrScanForm" (submit)="onSubmit()">
       <div class="grid">
         <label class="form-label">Original QR code Data</label>

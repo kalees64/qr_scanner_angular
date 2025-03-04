@@ -21,6 +21,7 @@
     "@angular/service-worker": "^19.1.0",
     "@tailwindcss/postcss": "^4.0.9",
     "@zxing/ngx-scanner": "^19.0.0",
+    "html5-qrcode": "^2.3.8",
     "postcss": "^8.5.3",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.0.9",
