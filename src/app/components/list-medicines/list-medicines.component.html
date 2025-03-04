@@ -1,1 +1,42 @@
-<p>list-medicines works!</p>
+<section class="p-2">
+  <h2 class="font-bold text-xl">Medicines</h2>
+
+  <div class="overflow-auto p-2 rounded bg-white">
+    <table class="w-full table-auto" border="2">
+      <thead>
+        <tr>
+          <th class="p-2">S.No</th>
+          <th class="p-2">Medicine Name</th>
+          <th class="p-2">Manugacturer Name</th>
+          <th class="p-2">Medicine Type</th>
+          <th class="p-2">Medicine Price</th>
+          <th class="p-2">Medicine QR</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @if(medicines && medicines.length){ @for(medicine of medicines;track
+        medicine;let i = $index){
+        <tr>
+          <td class="text-center p-2">{{ i + 1 }}</td>
+          <td class="text-center p-2">{{ medicine.medicine_name }}</td>
+          <td class="text-center p-2">{{ medicine.manufacturer_name }}</td>
+          <td class="text-center p-2">{{ medicine.medicine_type }}</td>
+          <td class="text-center p-2">{{ medicine.price }}</td>
+          <td class="text-center p-2">
+            <img
+              src="{{ medicine.re_labeled_qr_code }}"
+              alt="QR code"
+              class="size-32"
+            />
+          </td>
+        </tr>
+        } }@else {
+        <tr>
+          <td class="text-center p-2">{{ "No data" }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -144,6 +144,18 @@ export class ScannerComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    try {
+      const url = `http://localhost:3000/medicines?original_qr_data=${result}`;
+      const res: any = await firstValueFrom(this.http.get(url));
+      console.log('--Medicine Data : ', res);
+      if (res.length) {
+        this.navigateTo(`re-label/${res[0].current_qr_code_access_code}`);
+        return;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
     this.qrDataUrl = await this.generateQrCode(result);
 
     this.qrScanForm.patchValue({
